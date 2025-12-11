@@ -1,0 +1,6 @@
+[project]
+name = "controllers"
+version = "0.1.0"
+description = "Robotics controllers"
+requires-python = ">=3.12"
+dependencies = []

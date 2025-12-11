@@ -1,0 +1,6 @@
+[project]
+name = "planners"
+version = "0.1.0"
+description = "Robotics planners"
+requires-python = ">=3.12"
+dependencies = []
