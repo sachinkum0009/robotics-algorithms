@@ -12,7 +12,8 @@ class KalmanFilter(BaseFilter):
             Positional arguments for fitting the Kalman Filter.
         **kwargs : Any
             Keyword arguments for fitting the Kalman Filter.
-        Returns
+
+        Returns:
         -------
         KalmanFilter
             The fitted Kalman Filter instance.

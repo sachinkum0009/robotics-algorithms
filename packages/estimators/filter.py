@@ -14,7 +14,8 @@ class BaseFilter(ABC):
             Positional arguments for fitting the filter.
         **kwargs : Any
             Keyword arguments for fitting the filter.
-        Returns
+
+        Returns:
         -------
         BaseFilter
             The fitted filter instance.

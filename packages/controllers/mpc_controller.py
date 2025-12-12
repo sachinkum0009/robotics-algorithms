@@ -8,9 +8,12 @@ class MpcController(BaseController):
 
     def control(self, current_state, reference_trajectory) -> float:
         # Placeholder for MPC control logic
-        # In a real implementation, this would involve solving an optimization problem
-        # to minimize the cost function over the prediction horizon.
-        optimal_control_sequence = self._solve_optimization(current_state, reference_trajectory)
+        # In a real implementation, this would involve solving
+        # an optimization problem to minimize the cost function
+        # over the prediction horizon.
+        optimal_control_sequence = self._solve_optimization(
+            current_state, reference_trajectory
+        )
         return optimal_control_sequence[0]  # Return the first control input
 
     def _solve_optimization(self, current_state, reference_trajectory):
