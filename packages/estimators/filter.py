@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any
 
 class BaseFilter(ABC):
     """Abstract base class for all filter estimators."""

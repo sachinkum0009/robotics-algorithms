@@ -20,7 +20,8 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "visualstudioexptteam.vscodeintellicode",
-                "spencerwmiles.vscode-task-buttons"
+                "spencerwmiles.vscode-task-buttons",
+                "charliermarsh.ruff"
             ],
             "settings": {
                 "remote.autoForwardPorts": true,

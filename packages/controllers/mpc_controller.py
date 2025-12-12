@@ -1,6 +1,5 @@
 from .controller import BaseController
 
-from jax import numpy as jnp
 
 class MpcController(BaseController):
     def __init__(self, model, horizon: int):
