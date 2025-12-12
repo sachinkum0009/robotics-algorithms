@@ -1,0 +1,6 @@
+[project]
+name = "estimators"
+version = "0.1.0"
+description = "Robotics estimators"
+requires-python = ">=3.12"
+dependencies = []
