@@ -1,5 +1,6 @@
 from .controller import BaseController
 
+
 class LqrController(BaseController):
     def __init__(self, K):
         self.K = K  # State feedback gain matrix

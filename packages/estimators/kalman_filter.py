@@ -1,5 +1,6 @@
 from .filter import BaseFilter
 
+
 class KalmanFilter(BaseFilter):
     """Kalman Filter estimator for linear dynamic systems."""
 

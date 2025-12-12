@@ -1,6 +1,7 @@
+import heapq
+
 from .planner import BaseController
 
-import heapq
 
 class DijkstraPlanner(BaseController):
     def __init__(self, graph):
