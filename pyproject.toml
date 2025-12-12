@@ -30,6 +30,8 @@ line-length = 79
 extend-select = [
   "E501", 
   "UP",  # pyupgrade
+  "I",   # isort
+  "F",   # flake8
   # "D",   # pydocstyle
 ]
 
