@@ -8,10 +8,9 @@ class DijkstraPlanner(BaseController):
         self.graph = graph  # Graph represented as an adjacency list or matrix
 
     def plan(self, start_node, goal_node) -> list:
-
         # Dijkstra's algorithm implementation
         queue = [(0, start_node)]
-        distances = {node: float('inf') for node in self.graph}
+        distances = {node: float("inf") for node in self.graph}
         distances[start_node] = 0
         previous_nodes = {node: None for node in self.graph}
 
