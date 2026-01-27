@@ -18,12 +18,7 @@ class ImageDataloader:
         if image_path.is_dir():
             # Get all image files with common extensions
             self.image_files = sorted(
-                [
-                    f
-                    for f in image_path.iterdir()
-                    if f.suffix.lower()
-                    in {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"}
-                ]
+                [f for f in image_path.iterdir() if f.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"}]
             )
         else:
             self.image_files = [image_path]
@@ -42,7 +37,7 @@ class ImageDataloader:
         """Return the next image in the sequence."""
         if self.index >= len(self.image_files):
             raise StopIteration
-        
+
         image = cv2.imread(str(self.image_files[self.index]))
         self.index += 1
         return image

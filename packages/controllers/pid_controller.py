@@ -9,22 +9,16 @@ class PIDController(BaseController):
         self._previous_error = 0.0
         self._integral = 0.0
 
-    def control(
-        self, setpoint: float, measured_value: float, dt: float
-    ) -> float:
+    def control(self, setpoint: float, measured_value: float, dt: float) -> float:
         error = setpoint - measured_value
         self._integral += error * dt
         derivative = (error - self._previous_error) / dt if dt > 0 else 0.0
 
-        output = (
-            (self._kp * error)
-            + (self._ki * self._integral)
-            + (self._kd * derivative)
-        )
+        output = (self._kp * error) + (self._ki * self._integral) + (self._kd * derivative)
 
         self._previous_error = error
         return output
-    
+
     @property
     def kp(self) -> float:
         return self._kp
