@@ -1,4 +1,4 @@
-from .base_slam import BaseSlam
+from slam.base_slam import BaseSlam
 
 
 class Slam(BaseSlam):
