@@ -1,0 +1,50 @@
+# ==========================================
+# ty Configuration File (ty.toml)
+# ==========================================
+
+# 1. Target Environment Settings
+[environment]
+# Specify the Python version you are targeting
+python-version = "3.10"
+
+# Target platform: "linux", "darwin", "win32"
+# python-platform = "linux"
+
+# Extra search paths for packages or modules (similar to MYPYPATH)
+# extra-paths = ["./src", "./vendor"]
+
+# 2. File Selection Rules
+[src]
+# Directory paths or glob patterns to analyze
+include = ["src", "tests"]
+
+# Paths or patterns to ignore during checking
+exclude = [
+    ".venv",
+    "**/__pycache__",
+    "build",
+    "dist"
+]
+
+# 3. Rule Customization
+# Configure individual error rules.
+# Options: "ignore", "warn", "error"
+[rules]
+# Standard rules
+unresolved-import = "error"
+unimplemented-abstract-method = "error"
+
+# Turn on or off specific strictness preferences
+# division-by-zero = "warn"
+# redundant-cast = "ignore"
+
+# 4. Imports & Analysis Overrides
+[analysis]
+# Suppress unresolved import errors for specific external packages/stubs
+# if they don't have typing support installed yet
+allowed-unresolved-imports = [
+    # "some_third_party_lib.**"
+]
+
+# Respect standard '# type: ignore' comments alongside '# ty: ignore'
+respect-type-ignore-comments = true

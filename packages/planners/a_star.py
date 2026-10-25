@@ -1,7 +1,7 @@
 import heapq
-from itertools import count
-import sys
 import os
+import sys
+from itertools import count
 
 if __name__ == "__main__":
     sys.path.insert(
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     )
 
 
-from planners.graph import Node, Graph
+from planners.graph import Graph, Node
 from planners.planner import BasePlanner
 from planners.utils import plot_graph
 

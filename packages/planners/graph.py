@@ -1,12 +1,14 @@
-from dataclasses import dataclass, field
 import heapq
+from dataclasses import dataclass, field
 from itertools import count
+
 
 @dataclass
 class Node:
     """Represents a node in the graph"""
+
     name: str
-    neighbors: dict['Node', float] = field(default_factory=dict)
+    neighbors: dict["Node", float] = field(default_factory=dict)
 
     def __hash__(self):
         return hash(self.name)
@@ -15,6 +17,7 @@ class Node:
         if isinstance(other, Node):
             return self.name == other.name
         return NotImplemented
+
 
 @dataclass
 class Graph:
@@ -28,6 +31,7 @@ class Graph:
             self.nodes[neighbor_name] = Node(name=neighbor_name)
         self.nodes[node_name].neighbors[self.nodes[neighbor_name]] = weight
         self.nodes[neighbor_name].neighbors[self.nodes[node_name]] = weight
+
 
 @dataclass
 class QueueItem:

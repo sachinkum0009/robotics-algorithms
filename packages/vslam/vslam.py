@@ -5,13 +5,14 @@ from typing import Any
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-import rerun as rr
-from base_vslam import BaseVSLAM
 from cv2 import ORB, BFMatcher, UMat
 from cv2.typing import MatLike
 from jax import numpy as jnp
 from tqdm import tqdm
-from utils import CameraIntrinsics, ImageDataloader, load_intrinsics
+
+# import rerun as rr
+from vslam.base_vslam import BaseVSLAM
+from vslam.utils import CameraIntrinsics, ImageDataloader, load_intrinsics
 
 
 class VSLAM(BaseVSLAM):
@@ -65,7 +66,10 @@ class VSLAM(BaseVSLAM):
             rr.log(
                 "world/camera/image",
                 rr.Pinhole(
-                    resolution=[int(self._intrinsics.cx * 2), int(self._intrinsics.cy * 2)],
+                    resolution=[
+                        int(self._intrinsics.cx * 2),
+                        int(self._intrinsics.cy * 2),
+                    ],
                     focal_length=[self._intrinsics.fx, self._intrinsics.fy],
                     principal_point=[self._intrinsics.cx, self._intrinsics.cy],
                 ),
@@ -91,7 +95,9 @@ class VSLAM(BaseVSLAM):
         sorted_matches = sorted(matches, key=lambda x: x.distance)
         return sorted_matches
 
-    def feature_tracking(self, image1: MatLike, image2: MatLike, points1: UMat) -> Any:
+    def feature_tracking(
+        self, image1: MatLike, image2: MatLike, points1: UMat
+    ) -> Any:
         # Parameters for lucas kanade optical flow
         lk_params = dict(
             winSize=(15, 15),
@@ -104,7 +110,9 @@ class VSLAM(BaseVSLAM):
         )
 
         # Calculate optical flow
-        points2, status, err = cv2.calcOpticalFlowPyrLK(image1, image2, points1, None, **lk_params)
+        points2, status, err = cv2.calcOpticalFlowPyrLK(
+            image1, image2, points1, None, **lk_params
+        )
 
         # Select good points
         good_new = points2[status.ravel() == 1]
@@ -193,14 +201,28 @@ class VSLAM(BaseVSLAM):
                     rr.set_time_sequence("frame", 0)
                     rr.log("world/camera/image", rr.Image(img1))
                     # Log initial camera pose
-                    rr.log("world/camera", rr.Transform3D(translation=[0, 0, 0]))
+                    rr.log(
+                        "world/camera", rr.Transform3D(translation=[0, 0, 0])
+                    )
 
                 # Display first frame with keypoints (if visualization enabled)
                 if self._visualize:
                     vis_img = cv2.drawKeypoints(
-                        img1, keypoints1, None, color=(0, 255, 0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
+                        img1,
+                        keypoints1,
+                        None,
+                        color=(0, 255, 0),
+                        flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
                     )
-                    cv2.putText(vis_img, f"Frame 0 - Initialization", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    cv2.putText(
+                        vis_img,
+                        f"Frame 0 - Initialization",
+                        (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1,
+                        (0, 255, 0),
+                        2,
+                    )
                     cv2.imshow("VSLAM Pipeline", vis_img)
                     cv2.waitKey(1)
                 continue
@@ -215,15 +237,23 @@ class VSLAM(BaseVSLAM):
 
             # Need at least 8 points for fundamental matrix estimation
             if len(matches) < 8:
-                print(f"Frame {idx}: Not enough matches ({len(matches)} < 8), skipping")
+                print(
+                    f"Frame {idx}: Not enough matches ({len(matches)} < 8), skipping"
+                )
                 img1 = img2
                 keypoints1 = keypoints2
                 descriptor1 = descriptor2
                 continue
 
             # Extract matched keypoint coordinates
-            pts1 = np.array([keypoints1[m.queryIdx].pt for m in matches[:50]], dtype=np.float32)
-            pts2 = np.array([keypoints2[m.trainIdx].pt for m in matches[:50]], dtype=np.float32)
+            pts1 = np.array(
+                [keypoints1[m.queryIdx].pt for m in matches[:50]],
+                dtype=np.float32,
+            )
+            pts2 = np.array(
+                [keypoints2[m.trainIdx].pt for m in matches[:50]],
+                dtype=np.float32,
+            )
 
             # === STEP 3: Pose Estimation ===
             R, t, inliers = self.pose_estimation(pts1, pts2)
@@ -249,7 +279,9 @@ class VSLAM(BaseVSLAM):
             trajectory.append(pose_current.copy())
 
             # === STEP 4: Triangulation ===
-            points_3d_filtered = self.triangulation(pts1_inliers, pts2_inliers, Rt)
+            points_3d_filtered = self.triangulation(
+                pts1_inliers, pts2_inliers, Rt
+            )
 
             # === STEP 5: Local Mapping ===
             # Add validated 3D points to the map
@@ -277,7 +309,10 @@ class VSLAM(BaseVSLAM):
                 # Log 3D points in world coordinates
                 if points_3d_filtered.shape[1] > 0:
                     # Transform points to world coordinates
-                    points_3d_world = pose_current[:3, :3] @ points_3d_filtered + pose_current[:3, 3:4]
+                    points_3d_world = (
+                        pose_current[:3, :3] @ points_3d_filtered
+                        + pose_current[:3, 3:4]
+                    )
                     rr.log(
                         "world/points",
                         rr.Points3D(
@@ -302,7 +337,13 @@ class VSLAM(BaseVSLAM):
             if self._visualize and len(matches) > 0:
                 # Draw matches between frames (use stored previous keypoints)
                 vis_img = cv2.drawMatches(
-                    img1, keypoints1, img2, keypoints2, matches[:20], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
+                    img1,
+                    keypoints1,
+                    img2,
+                    keypoints2,
+                    matches[:20],
+                    None,
+                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS,
                 )
 
                 # Add info overlay
@@ -315,7 +356,15 @@ class VSLAM(BaseVSLAM):
                 ]
 
                 for i, text in enumerate(info_text):
-                    cv2.putText(vis_img, text, (10, 30 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    cv2.putText(
+                        vis_img,
+                        text,
+                        (10, 30 + i * 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 255, 0),
+                        2,
+                    )
 
                 cv2.imshow("VSLAM Pipeline", vis_img)
                 cv2.waitKey(1)  # 1ms delay to allow display update
@@ -336,7 +385,9 @@ class VSLAM(BaseVSLAM):
 
         print("\nPipeline complete!")
         print(f"Total frames processed: {len(trajectory)}")
-        print(f"Total 3D map points: {sum(pts.shape[1] for pts in map_points_3d)}")
+        print(
+            f"Total 3D map points: {sum(pts.shape[1] for pts in map_points_3d)}"
+        )
 
         # Log final accumulated 3D map to rerun
         if self._use_rerun and len(map_points_3d) > 0:
@@ -357,7 +408,9 @@ class VSLAM(BaseVSLAM):
                 print(f"\nRerun recording saved to: {self._rerun_output_path}")
                 print(f"To view: rerun {self._rerun_output_path}")
             else:
-                print("\nRerun visualization active. Check the Rerun viewer window.")
+                print(
+                    "\nRerun visualization active. Check the Rerun viewer window."
+                )
 
         # Visualize the trajectory
         if not self._use_rerun:
@@ -370,7 +423,9 @@ class VSLAM(BaseVSLAM):
 
     def pose_estimation(
         self, pts1: jnp.ndarray, pts2: jnp.ndarray
-    ) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray] | tuple[None, None, None]:
+    ) -> (
+        tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray] | tuple[None, None, None]
+    ):
         """
         Estimate camera pose between two frames using epipolar geometry.
 
@@ -388,12 +443,18 @@ class VSLAM(BaseVSLAM):
 
         # Build camera intrinsic matrix
         K = np.array(
-            [[self._intrinsics.fx, 0, self._intrinsics.cx], [0, self._intrinsics.fy, self._intrinsics.cy], [0, 0, 1]],
+            [
+                [self._intrinsics.fx, 0, self._intrinsics.cx],
+                [0, self._intrinsics.fy, self._intrinsics.cy],
+                [0, 0, 1],
+            ],
             dtype=np.float32,
         )
 
         # Compute the Fundamental matrix using RANSAC
-        F, inliers = cv2.findFundamentalMat(pts1_np, pts2_np, cv2.FM_RANSAC, 1.0, 0.99)
+        F, inliers = cv2.findFundamentalMat(
+            pts1_np, pts2_np, cv2.FM_RANSAC, 1.0, 0.99
+        )
 
         if F is None or inliers is None:
             return None, None, None
@@ -433,11 +494,34 @@ class VSLAM(BaseVSLAM):
         ax = fig.add_subplot(111, projection="3d")
 
         # Plot trajectory
-        ax.plot(positions[:, 0], positions[:, 1], positions[:, 2], "b-", linewidth=2, label="Camera Trajectory")
+        ax.plot(
+            positions[:, 0],
+            positions[:, 1],
+            positions[:, 2],
+            "b-",
+            linewidth=2,
+            label="Camera Trajectory",
+        )
 
         # Mark start and end points
-        ax.scatter(positions[0, 0], positions[0, 1], positions[0, 2], c="green", s=100, marker="o", label="Start")
-        ax.scatter(positions[-1, 0], positions[-1, 1], positions[-1, 2], c="red", s=100, marker="x", label="End")
+        ax.scatter(
+            positions[0, 0],
+            positions[0, 1],
+            positions[0, 2],
+            c="green",
+            s=100,
+            marker="o",
+            label="Start",
+        )
+        ax.scatter(
+            positions[-1, 0],
+            positions[-1, 1],
+            positions[-1, 2],
+            c="red",
+            s=100,
+            marker="x",
+            label="End",
+        )
 
         # Set labels and title
         ax.set_xlabel("X (meters)", fontsize=10)
@@ -460,7 +544,9 @@ class VSLAM(BaseVSLAM):
         else:
             plt.show()
 
-    def triangulation(self, pts1: jnp.ndarray, pts2: jnp.ndarray, Rt: jnp.ndarray) -> jnp.ndarray:
+    def triangulation(
+        self, pts1: jnp.ndarray, pts2: jnp.ndarray, Rt: jnp.ndarray
+    ) -> jnp.ndarray:
         """
         Reconstruct 3D points from matched 2D correspondences.
 
@@ -479,7 +565,11 @@ class VSLAM(BaseVSLAM):
 
         # Build camera intrinsic matrix
         K = np.array(
-            [[self._intrinsics.fx, 0, self._intrinsics.cx], [0, self._intrinsics.fy, self._intrinsics.cy], [0, 0, 1]],
+            [
+                [self._intrinsics.fx, 0, self._intrinsics.cx],
+                [0, self._intrinsics.fy, self._intrinsics.cy],
+                [0, 0, 1],
+            ],
             dtype=np.float32,
         )
 
@@ -489,7 +579,9 @@ class VSLAM(BaseVSLAM):
 
         # Triangulate points using OpenCV
         points_4d = cv2.triangulatePoints(P1, P2, pts1_np.T, pts2_np.T)
-        points_3d = points_4d[:3, :] / points_4d[3, :]  # Convert to Euclidean coords
+        points_3d = (
+            points_4d[:3, :] / points_4d[3, :]
+        )  # Convert to Euclidean coords
 
         # Filter out points with negative depth or too far
         valid_depth = (points_3d[2, :] > 0) & (points_3d[2, :] < 50)

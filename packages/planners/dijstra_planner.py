@@ -53,7 +53,7 @@ class DijkstraPlanner(BasePlanner):
             current_node = parent_map[current_node]
         path.reverse()
         return path
-    
+
     def plan2(self, start_node: Node, goal_node: Node) -> list:
         # Dijkstra's algorithm implementation
         queue = [(0, start_node)]  # (cost, node)
@@ -86,10 +86,12 @@ class DijkstraPlanner(BasePlanner):
             current_node = parent_map[current_node]
         path.reverse()
         return path
-    
+
     def plan3(self, start_node: Node, goal_node: Node) -> list:
         counter = count()  # tiebreaker to avoid comparing Node objects
-        queue: list[QueueItem] = [QueueItem(cost=0, counter=next(counter), node=start_node)]
+        queue: list[QueueItem] = [
+            QueueItem(cost=0, counter=next(counter), node=start_node)
+        ]
         visited_nodes = set()
         parent_map = {start_node: None}
 
@@ -104,13 +106,20 @@ class DijkstraPlanner(BasePlanner):
 
             for neighbor, weight in node.neighbors.items():
                 if neighbor not in visited_nodes:
-                    heapq.heappush(queue, QueueItem(cost=cost + weight, counter=next(counter), node=neighbor)) # type: ignore  # noqa: E501
+                    heapq.heappush(
+                        queue,
+                        QueueItem(
+                            cost=cost + weight,
+                            counter=next(counter),
+                            node=neighbor,
+                        ),
+                    )  # type: ignore  # noqa: E501
                     if neighbor not in parent_map:
                         parent_map[neighbor] = node
 
         if goal_node not in parent_map:
             return []
-        
+
         path = []
         current_node = goal_node
         while current_node is not None:

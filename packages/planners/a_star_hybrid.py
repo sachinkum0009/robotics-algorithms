@@ -100,7 +100,8 @@ class HybridAStarPlanner(BasePlanner):
     # ------------------------------------------------------------------
 
     def plan(self, start: HybridState, goal: HybridState) -> list[HybridState]:
-        """Return a list of HybridStates from *start* to *goal* (or [] if none)."""
+        """Return a list of HybridStates from *start* to *goal* (or [] if none)
+        """
         tie = count()
         open_heap: list = []
         heapq.heappush(open_heap, (self._f(start, goal), next(tie), start))

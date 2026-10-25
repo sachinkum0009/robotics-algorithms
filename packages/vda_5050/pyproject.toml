@@ -1,0 +1,6 @@
+[project]
+name = "vda_5050"
+version = "0.1.0"
+description = "Module to manage communications for VDA5050"
+requires-python = ">=3.12"
+dependencies = []

@@ -1,4 +1,4 @@
-from controller import BaseController
+from controllers.controller import BaseController
 
 
 class PIDController(BaseController):

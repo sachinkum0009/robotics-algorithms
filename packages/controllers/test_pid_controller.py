@@ -1,4 +1,4 @@
-from pid_controller import PIDController
+from controllers.pid_controller import PIDController
 
 
 def main():
